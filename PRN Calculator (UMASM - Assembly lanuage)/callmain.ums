@@ -1,0 +1,12 @@
+# Tanay Nistala (tnista01) and Ian Hackman (ihackm01)
+# 2023/12/12
+#
+# callmain.ums
+# A simple block to call main at the end of the init section
+
+.temps r6, r7
+.zero r0
+
+.section init
+    # calls main in calc40.ums
+    goto main linking r1

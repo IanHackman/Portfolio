@@ -1,0 +1,121 @@
+/******************************************************************************
+Name: Ian hackman (ihackm01) and Will Randall (wranda01)
+
+Help Recieved: TA was consulted with questions concerning failure cases. The 
+Hanson quick reference and textbook were consulted when implementing Sequences 
+and Stacks. 
+
+Correctly Implemented: All aspects of program were correctly implemented. 
+
+Departures From Design: Desgin originally had a separate module to handle to 
+I/O device, this was deemed unneccesary and instead all I/O was handle in the 
+instructions for input and output.
+
+System Architecture:
+        -  Modules: 
+                - memory_mamagement: This module handles all memory allocation
+                and structure for the sequence of segments used by the program.
+                This module contains functions that initialize the program
+                memory, set, get and increment the program counter, initialize
+                segment 0 by reading in instructions from the file and read, 
+                write, copy segments and free's all allocated memory. 
+                It deals only with the segments and values
+                themselves and their places in memory which only the module
+                knows and not anything else in the program. The module is used
+                by the 14 instructions that deal with loading, storing, mapping
+                and unmapping segments. The free function is called at the end
+                of the program to free all allocated memory.
+
+                - instruction_set: This module executes instructions. Each
+                instruction is contained in a relevant function and updates
+                the program memory and the registers accordingly. This module 
+                does not handle how each instruction is stored in memory, it 
+                only interacts with the inputted registers and values of each 
+                register. 
+
+                - um: This module handles the fetch, decode, execute cycle for 
+                the program. It opens the file, uses memory_management to 
+                initialize the program's memory representation and to get each 
+                instruction. It then matches each instruction with its opcode, 
+                gets each register and assignes its value from the
+                correspondingbits in the instructions, and uses instruction_set
+                module to execute each instruction. This module handles only
+                the registers and the fetch, decode, execute cycle. The
+                instruction execution and memory handling is done by other
+                modules. 
+                
+Time for 50 million Instructions: ~ 3 hours and 33 minutes
+- umdumping midmark, we find it has 30109 instructions.
+Timing our um program on midmark, we see it takes 7.695 seconds.
+The time it takes to run a program will be roughly proportional to the number
+of instructions. Therefore, the time it takes for 50 million instructions is:
+7.695 * 50000000 / 30109 seconds = ~3 hours and 33 minutes.
+
+UM Unit Tests: 
+        1. halt.um
+                - Halt tests the half instruction by callling halt immediatly 
+                  and ending the program.
+        3. input.um
+                - input tests the input function by inputting a value to r3 and
+                  then outputting r3 and halting.
+        2. input-output1.um
+                - Output tests the output instruction by having the character A
+                  inputted to register 3 using the input instruction and then 
+                  outputting register 3 to output. 
+                - NOTE: This test was also ran on a wide range of ascii inputs 
+                  many times, changing the contents of the input file, to
+                  ensure correct input.
+        5. load-value.um
+                - load value loads in the number 65, which will output as A in 
+                  ascii, to register 7 and then outputs the result.
+        6. conditional-move.um
+                - conditional move puts 65 in register A, 66 in register B and 
+                67 in register C. It then moves register b, 66 into register A 
+                and outputs register a. 
+        7. addition.um
+                - addition.um loads 27 into register 2 and 40 into register 3 
+                and adds them together, putting the result into register 1. 
+                Register 1 is then outputted as C, ascii 67. 
+        8. multiplication.um
+                - multiplication.um loads 5 into register 2 and 10 into
+                register 3 and then multiplies them, putting the result into
+                register 1 which is outputted as 2, or ascii 50. 
+        9. division.um
+                - division loads 201 into register 2 and 4 into register 3. The
+                contents are then divided and placed into r1 
+                which is outputted.
+                The result is 2, ascii 50, as 201/4 will be 50 due to flooring.
+                Then 204 is loaded into r2 and 4 into r3. 
+                The result is put into r1 and outputted as 3, ascii 51.
+        10. bitwise-NAND.um
+                - bitwise-NAND loads 0x40 into register 2, it then NANDs it
+                with itself into register 1. The same is done with 0x1 in
+                register 2 and into register 7. Then both register 1 and 7 are
+                NAND'd together and placed in register 6 which is outputted
+                as A, ascii 65.
+        11. map-segment.um
+                - map segment loads 10 into register 2, creating a new segment
+                of size 10, and then maps register 2 into register 3.
+        12. build_segmented_store_and_load_test.um
+                - build segmented store and load first maps a segment of length
+                10 into r3. It then stores 57 into r7 and uses segmented store
+                to store r7 into offset 9. Then it retrieves 57 back from
+                offset 9 in r3 using segmented load and outputs the result as
+                2, ascii 53.
+        13. unmap.um
+                - unmap mapps a segment of length 10 with register 3 as the
+                identifier and then unmaps the segment. 
+        14. load-program.um
+                - load-program maps a segment of 10 words with segment id as
+                r3. It then loads the program into segment 0 which will halt
+                the program. It then stores a value into r3 and then loads the
+                program so r3 is copied into segment 0. 
+
+Hours Spent Analyzing: 2 hours
+
+Hours Spent Preparing Design: 4 hours
+
+Hours Spent Solving Problmes After Analysis: 10 hours
+
+******************************************************************************/
+

@@ -1,0 +1,98 @@
+Ian Hackman (ihackm01) and Will Randall (wranda01)
+
+Help Recieved: No help was recieved from any TAs or course staff. Tools
+outlined in profiling lab were heavily used. 
+
+Routine that takes the most time:
+        - Case 8 in the swithc, case table takes the most time. 
+        - Assembly:
+  402780:	41 56                	push   %r14
+  402782:	41 55                	push   %r13
+  402784:	49 89 d5             	mov    %rdx,%r13
+  402787:	41 54                	push   %r12
+  402789:	49 89 fc             	mov    %rdi,%r12
+  40278c:	bf 10 00 00 00       	mov    $0x10,%edi
+  402791:	55                   	push   %rbp
+  402792:	89 f5                	mov    %esi,%ebp
+  402794:	53                   	push   %rbx
+  402795:	e8 06 e4 ff ff       	callq  400ba0 <malloc@plt>
+  40279a:	48 89 c3             	mov    %rax,%rbx
+  40279d:	48 85 c0             	test   %rax,%rax
+  4027a0:	0f 84 a7 00 00 00    	je     40284d <map_segment+0xcd>
+  4027a6:	41 89 ee             	mov    %ebp,%r14d
+  4027a9:	49 c1 e6 02          	shl    $0x2,%r14
+  4027ad:	4c 89 f7             	mov    %r14,%rdi
+  4027b0:	e8 eb e3 ff ff       	callq  400ba0 <malloc@plt>
+  4027b5:	48 89 03             	mov    %rax,(%rbx)
+  4027b8:	48 89 c7             	mov    %rax,%rdi
+  4027bb:	85 ed                	test   %ebp,%ebp
+  4027bd:	74 0a                	je     4027c9 <map_segment+0x49>
+  4027bf:	4c 89 f2             	mov    %r14,%rdx
+  4027c2:	31 f6                	xor    %esi,%esi
+  4027c4:	e8 77 e3 ff ff       	callq  400b40 <memset@plt>
+  4027c9:	49 8b 54 24 08       	mov    0x8(%r12),%rdx
+  4027ce:	49 8b 3c 24          	mov    (%r12),%rdi
+  4027d2:	89 6b 08             	mov    %ebp,0x8(%rbx)
+  4027d5:	89 6b 0c             	mov    %ebp,0xc(%rbx)
+  4027d8:	8b 42 08             	mov    0x8(%rdx),%eax
+  4027db:	85 c0                	test   %eax,%eax
+  4027dd:	74 29                	je     402808 <map_segment+0x88>
+  4027df:	48 8b 0a             	mov    (%rdx),%rcx
+  4027e2:	8d 70 ff             	lea    -0x1(%rax),%esi
+  4027e5:	48 8b 07             	mov    (%rdi),%rax
+  4027e8:	8b 2c b1             	mov    (%rcx,%rsi,4),%ebp
+  4027eb:	89 72 08             	mov    %esi,0x8(%rdx)
+  4027ee:	89 ea                	mov    %ebp,%edx
+  4027f0:	48 89 1c d0          	mov    %rbx,(%rax,%rdx,8)
+  4027f4:	5b                   	pop    %rbx
+  4027f5:	41 89 6d 00          	mov    %ebp,0x0(%r13)
+  4027f9:	5d                   	pop    %rbp
+  4027fa:	41 5c                	pop    %r12
+  4027fc:	41 5d                	pop    %r13
+  4027fe:	41 5e                	pop    %r14
+  402800:	c3                   	retq   
+  402801:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+  402808:	8b 6f 08             	mov    0x8(%rdi),%ebp
+  40280b:	89 e8                	mov    %ebp,%eax
+  40280d:	39 6f 0c             	cmp    %ebp,0xc(%rdi)
+  402810:	74 1e                	je     402830 <map_segment+0xb0>
+  402812:	48 8b 0f             	mov    (%rdi),%rcx
+  402815:	89 ea                	mov    %ebp,%edx
+  402817:	83 c0 01             	add    $0x1,%eax
+  40281a:	48 89 1c d1          	mov    %rbx,(%rcx,%rdx,8)
+  40281e:	89 47 08             	mov    %eax,0x8(%rdi)
+  402821:	5b                   	pop    %rbx
+  402822:	41 89 6d 00          	mov    %ebp,0x0(%r13)
+  402826:	5d                   	pop    %rbp
+  402827:	41 5c                	pop    %r12
+  402829:	41 5d                	pop    %r13
+  40282b:	41 5e                	pop    %r14
+  40282d:	c3                   	retq   
+  40282e:	66 90                	xchg   %ax,%ax
+  402830:	e8 6b fe ff ff       	callq  4026a0 <expand_outer_arrayList>
+  402835:	49 8b 3c 24          	mov    (%r12),%rdi
+  402839:	89 ea                	mov    %ebp,%edx
+  40283b:	8b 47 08             	mov    0x8(%rdi),%eax
+  40283e:	48 8b 0f             	mov    (%rdi),%rcx
+  402841:	83 c0 01             	add    $0x1,%eax
+  402844:	48 89 1c d1          	mov    %rbx,(%rcx,%rdx,8)
+  402848:	89 47 08             	mov    %eax,0x8(%rdi)
+  40284b:	eb d4                	jmp    402821 <map_segment+0xa1>
+  40284d:	ba 5b 00 00 00       	mov    $0x5b,%edx
+  402852:	be 64 5f 40 00       	mov    $0x405f64,%esi
+  402857:	bf c8 6d 60 00       	mov    $0x606dc8,%edi
+  40285c:	e8 ef 00 00 00       	callq  402950 <Except_raise>
+  402861:	e9 40 ff ff ff       	jmpq   4027a6 <map_segment+0x26>
+  402866:	66 2e 0f 1f 84 00 00 	nopw   %cs:0x0(%rax,%rax,1)
+  40286d:	00 00 00 
+
+        - Assembly Code Analysis:
+                There is no clear way to improve the assembly code of this
+                subroutine. Data is kept in registers where possible, (see for
+                example line 40279a), and there are no unnecessary loops. There
+                is no code redundancy or anything else that would slow down the
+                program. 
+
+Hours spent analyzing the problems in assignment: 2 hours
+
+Hours spent solving the problems in assignment: 7 hours

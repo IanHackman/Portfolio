@@ -1,0 +1,88 @@
+# Tanay Nistala (tnista01) and Ian Hackman (ihackm01)
+# 2023/12/12
+#
+# printd.ums
+# A function to print a signed integer to the console
+
+.temps r6, r7
+.zero r0
+
+.section stk
+    # initializes digit stack and pointer to stack
+    .space 10
+    end_digitstack:
+
+# PRINTD
+#
+# printd prints all the digits of a given valueby using recursion. printd
+# contains cases for if the digit is 0 or the most negative number,
+# printing either directly and if the value is positive or negative.
+# If the number is negative is prints the minus sign and
+# then recursivly prints the remaining digits. If the value is positive is
+# resursivly prints the digits.
+#
+# Registers:
+# Non-volitile register r3 always contains the pointer to the value stack. r5
+# alwys contains the value of the most negative number and volitile register
+# r4 contains the current value of the number being printed. r1 holds the return
+# address that will return to calc40.ums.
+#
+# Expexts:
+# printd expects a value in r4
+
+.section text
+    printd:
+        # implementation of digit stack pointer in r3 and most
+        # negative number in r5
+        push r3 on stack r2
+        r3 := end_digitstack
+        r5 := 0x80000000
+
+        # conditions for each tyoe of input
+        if (r4 == 0) goto printd_zero
+        if (r4 == r5) goto printd_min using r5
+        if (r4 <s 0) goto printd_neg using r5
+        if (r4 >s 0) goto printd_pos using r5
+
+        # implementation of case where zero is printed
+        printd_zero:
+            output "0"
+            goto printd_done
+
+        # implementation of most negative number case
+        printd_min:
+            output "-2147483648"
+            goto printd_done
+
+        # implementaion of printing negative number
+        printd_neg:
+            # print leading minus sign, get the value in r4  by getting
+            # complement and adding 1
+            output '-'
+            r4 := ~r4
+            r4 := r4 + 1
+
+        # implementation of printing positive number
+        printd_pos:
+            # get the first digit of number and push it onto stack
+            r5 := r4 mod 10
+            push r5 on stack r3
+
+            # remove the first digit and call recursive case
+            r4 := r4 / 10
+            if (r4 != 0) goto printd_pos
+
+        # implementation of printing a single digit
+        printd_digit:
+            # get value from the stack and convert from ascii to get value
+            pop r4 off stack r3
+            r4 := r4 + 48
+            # print value in r4 and call recursive case
+            output r4
+            if (r3 != end_digitstack) goto printd_digit using r5
+
+        # after every digit has been printed, remove the digit stack and return
+        printd_done:
+            pop r3 off stack r2
+            goto r1
+

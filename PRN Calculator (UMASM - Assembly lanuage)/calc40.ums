@@ -1,0 +1,512 @@
+# Tanay Nistala (tnista01) and Ian Hackman (ihackm01)
+# 2023/12/12
+#
+# calc40.ums
+# A calculator that uses Reverse Polish Notation
+
+# Declare the zero and temporary registers
+.zero  r0
+.temps r6, r7
+
+# STACK SETUP
+# Allocates space for the value stack and jump table
+.section rodata
+    # Initialize the value stack
+    .space 10000
+    end_valuestack:
+
+    # Initialize the jump table
+    .space 256
+    end_jumptable:
+
+# JUMP TABLE SETUP
+#
+# Sets up the jump table for the main program loop
+# All characters are routed to input_error by default
+# digits are routed to the digit state
+# space is routed to the waiting state
+# All other operators are routed with their respective
+# function implementations
+.section init
+    # Initialize the value stack pointer
+    r3 := end_valuestack
+    r4 := end_jumptable
+
+    init_jumptable:
+        m[r0][r4] := input_error
+        r4 := r4 - 1
+        if (r4 != 255) goto init_jumptable using r5
+
+    # Set the jump table values for the digits
+    m[r0][end_jumptable - '0'] := digit
+    m[r0][end_jumptable - '1'] := digit
+    m[r0][end_jumptable - '2'] := digit
+    m[r0][end_jumptable - '3'] := digit
+    m[r0][end_jumptable - '4'] := digit
+    m[r0][end_jumptable - '5'] := digit
+    m[r0][end_jumptable - '6'] := digit
+    m[r0][end_jumptable - '7'] := digit
+    m[r0][end_jumptable - '8'] := digit
+    m[r0][end_jumptable - '9'] := digit
+
+    # Set the jump table values for space
+    m[r0][end_jumptable - ' '] := waiting
+
+# MAIN PROGRAM LOOP
+#
+# The program loop consists of two main states: waiting and entering.
+#
+# The waiting state reads a character from input, checks for EOF,
+# and routes to the appropriate jump table entry.
+#
+# The entering state is used when the program is currently reading
+# a number. It checks if the character is a digit, and if so, amends
+# the current number on the value stack. If the character is not a
+# digit, it routes to the appropriate jump table entry using the
+# waiting_char label.
+.section text
+
+    main:
+        push r1 on stack r2
+
+    waiting:
+        # Read a character from input
+        # output "w: "
+        r4 := input()
+
+    waiting_char:
+        # Check for EOF
+        if (r4 == -1) goto done using r5
+
+        # Route to the jump table
+        r5 := end_jumptable - r4
+        goto m[r0][r5]
+
+    entering:
+        # output "e: "
+        r4 := input()
+
+        if (r4 <s 48) goto waiting_char using r5
+        if (r4 >s 57) goto waiting_char using r5
+
+        # Amend the current number on the value stack
+        pop r5 off stack r3
+        r5 := r5 * 10
+        r5 := r5 + r4
+        r5 := r5 - 48
+        push r5 on stack r3
+        goto entering
+
+    done:
+        pop r1 off stack r2
+        halt
+
+# DIGIT
+# Pushes a new digit onto the value stack
+#
+# Parameters:
+#   r4: The ASCII value of the digit
+.section text
+    digit:
+        r4 := r4 - 48
+        push r4 on stack r3
+        goto entering
+
+################################################################
+
+# BINARY OPERATORS
+#
+# These operators first check that there are at least two operands
+# on the value stack. During this stage, r5 is used to store the
+# number of operands on the value stack, and r4 is used to store
+# the number of operands required by the operator. If there are
+# not enough operands, the program throws a stack error.
+#
+# After checking the number of operands, the program pops the
+# operands off the value stack and performs the operation.
+# r5 stores the first operand, and r4 stores the second operand.
+# The result is then pushed back onto the value stack.
+
+# ADDITION
+# Adds the top two values on the value stack
+# and pushes the result back onto the value stack
+.section init
+    m[r0][end_jumptable - '+'] := add
+
+.section text
+    add:
+        # Check to make sure there are two operands on the value stack
+        r5 := end_valuestack - r3
+        r4 := 2
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+        pop r5 off stack r3
+
+        # Add the two operands together
+        r1 := r5 + r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+# SUBTRACTION
+# Subtracts the top 2 values on the value stack
+# and pushes their result back onto the value stack
+.section init
+    m[r0][end_jumptable - '-'] := sub
+
+.section text
+    sub:
+        # Check to make sure there are two operands on the value stack
+        r5 := end_valuestack - r3
+        r4 := 2
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+        pop r5 off stack r3
+
+        # Subtra the two operands together
+        r1 := r5 - r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+# MULTIPLICATION
+# Multiplies the top 2 values on the value stack
+# and pushes their result back onto the value stack
+.section init
+    m[r0][end_jumptable - '*'] := mul
+
+.section text
+    mul:
+        # Check to make sure there are two operands on the value stack
+        r5 := end_valuestack - r3
+        r4 := 2
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+        pop r5 off stack r3
+
+        # Multiply the two operands together
+        r1 := r5 * r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+# DIVISION
+# Divides the top 2 values on the value stack
+# and pushes their result back onto the value stack
+.section init
+    m[r0][end_jumptable - '/'] := div
+
+.section text
+    div:
+        # Check to make sure there are two operands on the value stack
+        r5 := end_valuestack - r3
+        r4 := 2
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+        pop r5 off stack r3
+
+        # Check for division by zero and negative operands
+        if (r4 == 0) goto div_by_zero using r1
+        if (r5 <s 0) goto div_neg     using r1
+        if (r4 <s 0) goto div_pos_neg using r1
+
+        # Divide the two operands
+        r1 := r5 / r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+    # Error handling for division by zero
+    div_by_zero:
+        output "Division by zero\n"
+        push r5 on stack r3
+        push r4 on stack r3
+        goto waiting
+
+    # Division with a negative dividend
+    div_neg:
+        # Negate the first operand
+        r5 := -r5
+
+        # If the second operand is negative, go to the `div_neg_neg` case
+        if (r4 <s 0) goto div_neg_neg using r1
+
+        # Divide the two operands
+        r1 := r5 / r4
+        r1 := -r1
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+    # Division with a negative divisor and negative dividend
+    div_neg_neg:
+        # Negate the second operand
+        r4 := -r4
+
+        # Divide the two operands
+        r1 := r5 / r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+    # Division with a positive divisor and negative dividend
+    div_pos_neg:
+        # Negate the second operand
+        r4 := -r4
+
+        # Divide the two operands
+        r1 := r5 / r4
+        r1 := -r1
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+# OR
+# Performs a bitwise or on the top 2 values on the value stack
+# and pushes their result back onto the value stack
+.section init
+    m[r0][end_jumptable - '|'] := or
+.section text
+    or:
+        # Check to make sure there are two operands on the value stack
+        r5 := end_valuestack - r3
+        r4 := 2
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+        pop r5 off stack r3
+
+        # Perform bitwise or on the 2 operands
+        r1 := r5 | r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+
+# AND
+# Performs a bitwise and on the top 2 values on the value stack
+# and pushes their result back onto the value stack
+.section init
+    m[r0][end_jumptable - '&'] := and
+.section text
+    and:
+        # Check to make sure there are two operands on the value stack
+        r5 := end_valuestack - r3
+        r4 := 2
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+        pop r5 off stack r3
+
+        # Perform bitwise and on the 2 operands
+        r1 := r5 & r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+# SWAP
+# Swaps the top 2 values on the value stack
+.section init
+    m[r0][end_jumptable - 's'] := swp
+.section text
+    swp:
+        # Check to make sure there is one operand on the value stack
+        r5 := end_valuestack - r3
+        r4 := 2
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+        pop r5 off stack r3
+
+        # Push the operands back in reverse order
+        push r4 on stack r3
+        push r5 on stack r3
+        goto waiting
+
+################################################################
+
+# UNARY OPERATORS
+#
+# These operators first check that there is at least one operand
+# on the value stack. During this stage, r5 is used to store the
+# number of operands on the value stack, and r4 is used to store
+# the number of operands required by the operator. If there are
+# not enough operands, the program throws a stack error.
+#
+# After checking the number of operands, the program pops the
+# operand off the value stack and performs the operation. The operand
+# is stored in r4. The result is then pushed back onto the value stack.
+
+# NEGATE
+# Negates the top value on the value stack
+# by performing a bitwise complement and adding 1
+.section init
+    m[r0][end_jumptable - 'c'] := neg
+.section text
+    neg:
+        # Check to make sure there is one operand on the value stack
+        r5 := end_valuestack - r3
+        r4 := 1
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+
+        # Perform bitwise complement on the 2 operands
+        r1 := -r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+# BITWISE COMPLEMENT
+# Performs a bitwise complement on the top value on the value stack
+.section init
+    m[r0][end_jumptable - '~'] := not
+.section text
+    not:
+        # Check to make sure there is one operand on the value stack
+        r5 := end_valuestack - r3
+        r4 := 1
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+
+        # Perform bitwise complement on the 2 operands
+        r1 := ~r4
+
+        # Push the result onto the value stack
+        push r1 on stack r3
+        goto waiting
+
+# DUPLICATE
+# Duplicates the top value on the value stack
+.section init
+    m[r0][end_jumptable - 'd'] := dup
+.section text
+    dup:
+        # Check to make sure there is one operand on the value stack
+        r5 := end_valuestack - r3
+        r4 := 1
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the two operands off the value stack
+        pop r4 off stack r3
+
+        # Push the operands back in reverse order
+        push r4 on stack r3
+        push r4 on stack r3
+        goto waiting
+
+# POP VALUE
+# Discards the top value on the value stack
+.section init
+    m[r0][end_jumptable - 'p'] := pop_val
+.section text
+    pop_val:
+        # Check to make sure there is one operand on the value stack
+        r5 := end_valuestack - r3
+        r4 := 1
+        if (r5 <s r4) goto stack_error using r5
+
+        # Pop the operand off the value stack
+        pop r4 off stack r3
+        goto waiting
+
+################################################################
+
+# CLEAR STACK
+# Clears the value stack
+.section init
+    m[r0][end_jumptable - 'z'] := clr
+.section text
+    clr:
+        # Check to make sure there is an operand on the value stack
+        r5 := end_valuestack - r3
+        r4 := 1
+        if (r5 <s r4) goto waiting using r5
+
+        # Pop the operand off the value stack
+        pop r4 off stack r3
+        goto clr
+
+
+# PRINT
+# Prints the value stack by calling printd
+# on each element of the value stack
+.section init
+    m[r0][end_jumptable - '\n'] := print
+
+.section text
+    print:
+        # Save the value stack pointer
+        push r3 on stack r2
+
+        print_loop:
+            # Check to make sure there are values on the value stack
+            if (r3 == end_valuestack) goto print_done using r5
+
+            # Print the value
+            output ">>> "
+            r4 := m[r0][r3]
+            goto printd linking r1
+
+            # Print a newline
+            output "\n"
+            r3 := r3 + 1
+            goto print_loop
+
+        print_done:
+            # Restore the value stack pointer
+            pop r3 off stack r2
+            goto waiting
+
+# ERROR MESSAGES
+.section text
+    # Error handling for insufficient operands on the value stack
+    stack_error:
+        output "Stack underflow---expected at least "
+
+        # Print the expected number of operands
+        r4 := r4 + 48
+        output r4
+        if (r4 >s 49) goto print_txt_elements using r5
+
+        # Print "element" if the expected number of operands is 1
+        output " element\n"
+        goto waiting
+
+        # Print "elements" if the expected number of operands is greater than 1
+        print_txt_elements:
+            output " elements\n"
+            goto waiting
+
+    # Error handling for unknown characters
+    input_error:
+        output "Unknown character '"
+
+        # Print the unknown character
+        output r4
+        output "'\n"
+        goto waiting

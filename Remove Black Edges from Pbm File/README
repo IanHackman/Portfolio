@@ -1,0 +1,16 @@
+Ian Hackman (ihackm01) and Nathan Moreno (nmoren01)
+
+Help Received: All programming was done as a pair. TAs Elizabeth and Julia 
+               were consulted for questions concerning 
+               mallocing and reading in pgms. THe Hanson quick reference, 
+               UArray supplemental chapter and the course textbook 'The C 
+               Programming Language' were consulted for implementing the Hanson
+               data structures UArray and stack. The Pnmrdr interface was used 
+               for reading in pgms and pbms.
+
+Correctly Implemented: The entirety of unblackedges.c, sudoku.c, Bit2.h and 
+                       Bit2.c and UArray.h and Uarray.c have been implemented 
+                       correctly and function on all inputs and edge cases of 
+                       sudoku and bitmaps for each program respectively.
+
+Hours Spent: 15 hours

@@ -1,0 +1,75 @@
+* Tanay Nistala (tnista01)
+* Ian Hackman (ihackm01)
+
+# README
+
+## Acknowledgements:
+
+N/A
+
+## Assignment:
+
+To our knowledge, all aspects of the assignment have been implemented correctly.
+
+## Departures From calling convention:
+There were no departures, calling convention was kept the same.
+
+## Implementation of print module:
+
+The print module handles cases for zero and 0x80000000 separately, while for
+negative numbers prints a minus (-) sign and negates the number before printing
+it as a positive number. Positive numbers are printed as is, by pushing digits
+to a digit stack and then popping them to print them in the correct order.
+
+## Implementation of Value Stack:
+The value stack is represented as a stack of size 10000 with a pointer to
+the end of the stack kept in r3.
+
+## List of sections created in each file:
+
+* urt0.ums
+  * .section init
+    * initialize the zero register and temporary registers
+
+  * .section stk
+    * allocate memory for the call stack and establish endstack as the end of
+      the stack.
+
+  * .section init
+    * initialize the call stack, a pointer to the start in register r0 and a
+      pointer to the end, endstack, at register r2
+
+
+* calc40.ums
+  * .section rodata
+    * allocate space for the cal value stack and the jump   table
+
+  * .section init
+    * initialize the jumptable and value stack, setting r3 to point to value
+      stack and r4 to point to jumptable
+    * initialize every digit in jumptable to endstack, then set digit 0 - 9.
+    * initializes the jumptable for the operations, matching the characters
+      to their respective operations
+
+  * .section text
+    * contains the waiting, waiting with character and entering states, as
+      well as the main loop that runs until EOF
+    * implements each of the operations and the code for reading digits
+    * implements error messages
+
+* printd.ums
+  * .section stk
+    * allocate smemory for digit stack of size 10 for digits 0-9
+  * .section text
+    * initializes the stack and sets register r3 to point to the
+      end of the stack
+    * implements printdrecursive function and each of the conditions,
+      print_zero, print_min,print_neg and print_pos
+* callmain.ums:
+  * .section init
+    * calls main in calc40.ums
+
+## Time Spent:
+Hours Spent Analyzing Problems in Assignment: 1
+Hours Spent Writing Assembly Code: 6
+Hours Spent Debugging Code: 5

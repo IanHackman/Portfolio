@@ -1,0 +1,16 @@
+not
+1 not
+{ { } } not exec exec print
+clear
+drop
+dup
+swap 1 swap clear 
++ - * / mod < > <= <= == clear 
+1 + - * / mod < > <= <= == clear 
+#t 1 + - * / mod < > <= <= clear 
+1 #t + - * / mod < > <= <= clear
+exec 1 exec #t exec clear
+file { add.cylc  } exec file 
+if #t { } 5 if clear #t 5 { } if clear 17 { } { } if 
+#t if #t { } if clear 
+yug okopk qw quit

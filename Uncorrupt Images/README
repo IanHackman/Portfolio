@@ -1,0 +1,38 @@
+/*
+README
+HW1 filesofpix
+Ian Hackman (ihackm01) and Stephen Burchfield (sburch01)
+
+Help recieved:
+- Programming was done as a pair. Resources used were the Hanson quick 
+reference for help building the table and sequence. The textbook, 
+'The C Programming Language' was used for the data structures to get a more in 
+depth look at the functionality and implementation. Resources online included 
+Stack Overflow for examples in more specific cases mostly related to 
+understanding c. Also 'C idioms' was used for writing in a file and comparing 
+Atom Strings specifically. These included examples on how to malloc, valgrind 
+errors, how to read in a file, etc. TAs were consulted for specific issues in 
+the program and for looking over the design and implementation plan. The 
+specific issues were valgrind errors when malloc-ing an array and assigning 
+characters to the array, problems reading in null termination characters by 
+Atom_string which required switiching to Atom_new, incorrect raw pgm outputs 
+and valgrind errors when running turing_corrept specifically. The TAs consulted
+were Sam, Rohun, Bill, Julia and Dan. AIs were not consulted. 
+
+Correctly Implemented:
+- readaline: the full credit implementation of readline has been correctly 
+implemented. The funciton ALLOCs 1001 bytes. A int increments every time a 
+character is read in and if the int reached 1001 more bytes are allocated.
+- restoration: all corrupted files are read in, the original infusion sequence 
+is identified, stripped and outputted to a raw pgm format, or 'P5'. All of the 
+following was implemented: The lines are read in using readaline, the infusion 
+sequences are put into atoms and the numbers into int 
+arrays. Then the infusion sequences are inputted into a Hanson table to 
+determine the original. After the original is determined they are placed in a 
+sequence and each line read in is compared to the original. Then a funciton 
+prints the contents of the sequence in raw pgm format. 
+
+
+Hours Spent on filesofpix:
+- 40 hours
+*/

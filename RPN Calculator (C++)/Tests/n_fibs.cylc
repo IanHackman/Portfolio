@@ -1,0 +1,16 @@
+dup
+0
+<
+{ drop }
+{
+     dup
+     1 -
+     { n_fibs.cylc }
+     file
+     { fib } print drop
+     print
+     { = } print drop
+     { fib.cylc } file
+     print drop
+}
+if

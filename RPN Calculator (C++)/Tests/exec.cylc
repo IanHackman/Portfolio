@@ -1,0 +1,12 @@
+{ 5 print 6 print 7 print clear } exec
+{ #t print } { #f print } exec clear 
+{ #t print not print not print #f not print } exec clear
+{ 4 6 #t #f} exec print { 7 85 12 { } } exec print { { g4rfewd { ewfefg } } exec clear } exec
+{ 4 print { 5 { print { swap } exec print } exec drop print } exec clear } exec 
+{ #f 56 swap print drop print clear } exec
+{ 4 3 + print } exec { 4 3 - print } exec { 4 3 * print } exec clear
+{ 50 5 / print } exec { 45 7 mod print } exec clear
+{ { 4 3 < print } exec { 3 4 < print } exec 
+{ 4 3 > print } exec { 4 3 > print } exec } exec clear
+{ { 4 3 <= print } exec { 3 4 <= print } exec { 4 3 >= 3 print } exec { 4 >= print } exec { 4 4 <= print } exec { 5 5 >= print } exec clear } exec 
+{ { 4 } exec { 5 == print } exec { 7 == } exec { print { } } exec { == print } exec { #f print { try } { try } print clear } exec } exec 
