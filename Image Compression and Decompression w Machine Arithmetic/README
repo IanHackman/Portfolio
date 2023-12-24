@@ -1,0 +1,35 @@
+Ian Hackman (ihackma01)
+Will Randall (wranda01)
+
+
+ARCHITECTURE
+
+40image.c
+Parses command line arguments and calls either compress40 or decompress40
+on the correct input.
+
+compress40.h & compress40.c
+Provides client a compress function, taking in an image through an input
+parameter and outputting the compressed image to stdout. 
+
+decompress40.h & decompress40.c
+Provides client a decompress function, taking in a compressed image through an
+input parameter and outputting the decompressed image to stdout.
+
+dct.h & dct.c
+Provides the client with the ability to run discrete cosine transforms and 
+inverse discrete cosine transforms.
+
+
+ACKNOWLEDGEMENTS
+We recieved help from course staff via piazza and office hours.
+
+IMPLEMENTATION CORRECTNESS
+All aspects of the assignment have been correctly implemented.
+
+TIME SPENT
+Time spent analyzing problems:  10 hours
+Time spent solving problems:    10 hours
+
+
+

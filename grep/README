@@ -1,0 +1,421 @@
+
+Project 4: gerp
+cs15
+README
+Ian Hackman (ihackm01) and Miles Mamigonian (mmamig01)
+Completed on 13 December 2022 
+*******************************************************************************
+
+
+Program Purpose:
+---------------
+Gerp is designed to emulate many of the aspects of the Unix command "grep."
+Specifically, gerp allows a user to provide a system of file directories, which
+the program then processes into a searchable format. The program prompts the
+user for a word to search with the prompt "Query? ", at which point the user
+can give the program a word. The program then prints, to a file specified by
+the user, every line that the given word appears on in the entire file system.
+It prints in the following format: filepath/filename:line#: contents of line.
+
+
+Compile/run:
+-----------
+    - Compile using
+            make gerp
+    - run executable with ./gerp inputDirectory output_file.txt
+
+
+Architectural Overview: 
+----------------------
+gerp has 2 major classes tht interact with each other. The Gerp class runs 
+the program and ocmmand loop, while the gerpHash class adds the information 
+to a hash table which is used to store information. In Gerp.cpp, classes 
+FSTree and DirNode are used to construct the tree (FSTree) and access the 
+information, names, numbers and pointers of and to directories, 
+subdirectories  and files in the tree (DirNode). When Gerp.cpp travrses 
+over every word in every file int he directory tree, it uses the gerpHash 
+class to store the file number and the line number of the words. The contents 
+of the line are stores within a separate vector of vector of strings, where the 
+first vector is indexed by the file number and the second vector is indexed by 
+the line number. When the program outputs, it uses the filenumber and line 
+number to access the correct indexes of the vector with the files and lines. 
+The gerpHash class contains the following structs and vecotrs: wordInfo contains
+the line number a word is found on and the index of the file number where the 
+line the word is on is stored. VersionsInfo contains a stirng with the word, 
+not lowercased, and a vecotr of wordInfo structs that conain every single 
+instance of the same word, the line numbers and pathway indexes. The chainInfo
+struct contains the lowercase version of the word and a vector of versionsInfo
+structs with every version of the same lowercased word (The vs the vs tHe). 
+The hashTable itself is a vector of vectors, for chaining, of versionsInfo 
+structs. The Gerp class uses gerpHash to read in and index every struct as well
+as returns vectors, a vector of verisonsInfo structs for caseInsensitive and a
+vecotr of wordInfo structs for case sensitive, which are iterated over and 
+the contents printed out. 
+
+
+Acknowledgments:
+---------------
+Help from TAs with design checkoff and with program difficulties during 
+office hours
+
+
+Files:
+-----
+Gerp.h:         interface and funciton declarations for Gerp class. 
+                Includes classes gerpHash, DirNode and FSTree
+
+Gerp.cpp:       function definitions for Gerp class. Includes classes 
+                gerpHash, DirNode and FSTree
+
+gerpHash.h:     interface and funciton declarations for gerpHash class.
+
+gerpHash.cpp:   function definitions for gerpHash class
+
+main.cpp:       driver file to start gerp and pass the command arguments 
+                to the Gerp class
+
+README:         this file
+
+Makefile:       File to build the program.
+
+
+Data Structures:
+---------------
+Hash Table:     We used a hash table to store the information about each word
+                in the file system. A hash table is a data structure that maps
+                "keys" to "values." In our case, the key is the lowercase 
+                version of the word, which is run through a built-in hash 
+                function and then compressed by modding by the size of the 
+                hash table. The values are the specific filepaths and line 
+                numbers that each word is found at. We use chaining to deal 
+                with collisions. An important algorithm that is integral to 
+                any hash function, including ours, is the process of rehashing.
+                Rehashing happens when the load factor grows to greater than 
+                0.75. If that happens, we create a new hash table that is 
+                double the size of our old hash table and then rerun each word
+                through the hash function. We go over the specific structure
+                of our hash table in the program architecture section. One of
+                the primary strengths of a hash table is its ability to add and
+                access elements in constant time - i.e. O(1). This is important
+                in gerp because the file systems that we are dealing with are 
+                very large, so anything other than constant time addition or 
+                access would be completely impractical.
+
+List:           The data structure used in this program is an array list which 
+                is an array that dynamically expands to fit elements added to 
+                the array. It was created using std::vector, using its public 
+                functions size(), front(), back(), clear(), resize(size) and 
+                push_back(). In our program, vectors are used to represent the 
+                hash table as a vector of vectors of chainInfo structs. Vectors 
+                also represent the chain, a vector of chainInfo, the versions of
+                a word, a vector of VersionsInfo, and the instances of a word, a
+                vector of wordInfo structs. The file nubers and line contents is
+                also represented as a vector of vectors of strings, the lines.
+                The advantages of using an array list are that the 
+                list can be resized so that adding elements is easy. In addition
+                array lists allow for quick acess if one has the index of the 
+                element they wish to find. The disadvantages of an array list 
+                are that allocating a new array and copying old elements to the 
+                new array takes a long time. In addition, adding or deleting 
+                items can take awhile as one needs to shift every item in the 
+                list foward or backwards. 
+
+Testing:
+-------
+    Phase 1: tetsing for phase 1 was doen through main functions. For 
+    stringProcessing, a main.cpp driver was created and the following tests 
+    were ran to test edge cases. Full string ("!@#$%COMP-15%$$!%"), front 
+    only ("!@#$%COMP-15"), back only ("COMP-15%$$!%"), no non alphanums 
+    ("COMP-15"), empty string (""), no alphanums ("!@#$%^") and single 
+    character ("!@#$@C!@##@"). Here are the tests:
+        std::string test1 = "@##!!#!@!#COMP-15!!!!!!!";
+        std::string result1 = stripNonAlphaNum(test1);
+        std::cout << "Final string full: " << result1 << std::endl;
+        if ("COMP-15" == result1) {
+                std::cerr << "Correct!" << std::endl;
+        } else {
+                std::cerr << "False!" << std::endl;
+        }
+
+        std::string test2 = "COMP-15!!!!!!!";
+        std::string result2 = stripNonAlphaNum(test2);
+        std::cout << "Final string no front: " << result2 << std::endl;
+        if ("COMP-15" == result2) {
+            std::cerr << "Correct!" << std::endl;
+        } else {
+            std::cerr << "False!" << std::endl;
+        }
+
+        std::string test3 = "@##!!#!@!#COMP-15";
+        std::string result3 = stripNonAlphaNum(test3);
+        std::cout << "Final string no end: " << result3 << std::endl;
+        if ("COMP-15" == result3) {
+            std::cerr << "Correct!" << std::endl;
+        } else {
+            std::cerr << "False!" << std::endl;
+        }
+
+        std::string test4 = "COMP-15";
+        std::string result4 = stripNonAlphaNum(test4);
+        std::cout << "Final string naked: " << result4 << std::endl;
+        if ("COMP-15" == result4) {
+            std::cerr << "Correct!" << std::endl;
+        } else {
+            std::cerr << "False!" << std::endl;
+        }
+
+        std::string test5 = "";
+        std::string result5 = stripNonAlphaNum(test5);
+        std::cout << "Final string empty: " << result5 << std::endl;
+        if ("" == result5) {
+            std::cerr << "Correct!" << std::endl;
+        } else {
+            std::cerr << "False!" << std::endl;
+        }
+
+        std::string test6 = "@##!!#!@!#C#$%^&";
+        std::string result6 = stripNonAlphaNum(test6);
+        std::cout << "Final string one char: " << result6 << std::endl;
+            if ("C" == result6) {
+        std::cerr << "Correct!" << std::endl;
+        } else {
+            std::cerr << "False!" << std::endl;
+        }
+
+    Testing for FSTreeTraversal was straightfoward. Since the function is 
+    supposed to print out the file path, directories, subdirectories and files, 
+    for each file, testing only included running the function and then checking 
+    if the output was the same as it should be by going through the testing 
+    directories and checking if each file was reached. FSTreeTraversal included 
+    its own main function. Here it is:
+        int main(int argc, char *argv[]) {
+            if (argc != 2) {
+                std::cerr << "Wrong number of arguments!" << std::endl;
+                return 1;
+            }
+            std::string directory = argv[1];
+            FSTree newTree(directory);
+            DirNode *root = newTree.getRoot();
+            traverseTree(root, directory + "/");
+            return 0;
+        }
+
+    Phase 2: Testing phase 2 of our program was done also by creating an 
+    instance of Gerp in main and then passing the number of arguments and the 
+    stirng with the directoy and the output file. The first test was for 
+    providing the correct arguments. This was done by providing one more and 
+    one less argument and seeing if the error statement was thrown. Next was 
+    tetsing if the tree was created and file files were reached. Since this was 
+    the same as stringProcessing.cpp, the same tetsing in phase 1 was done for 
+    phase 2. In testing addFileToHash, we first, instead of printingt he file 
+    pathways like in phase 1, we called the function and then printed an error 
+    statement, std::cerr << "Reached addFileToHash!!!" << std::endl;. Next we 
+    opened the files and printed all of the contents. Here is the code:
+        std::string word;
+        while (infile >> word) {
+            std::cerr << word << " " << std::endl;
+        }
+
+    Next was implementing getline and turining the line into a strng stream. 
+    Here we printed out the line and each word from the stream. Here is the 
+    code:
+        std::string line;
+        while(std::getline(inputFile, line)) {
+            std::cerr << line << " " << std::endl;
+            std::string word;
+            std::istringstream ss(line);
+            while (ss >> word) {
+                std::cerr << word << " " << std::endl;
+            }
+
+    Next was testing insert and the gerpHash class. This was done by, when 
+    reading in each word from the stringstream calling the insert function and 
+    printing an message indicating that the function was reached "std::cerr << 
+    "Insert reached! << std::endl;". Next thing to test wa slowercasing each 
+    word. This was done by calling the std::tolower function from <cctype> and 
+    ptining the final string. "std::string lowered = lowercase(word); std::cerr 
+    << lowered << std::endl;". Next was tesing getting the index. Again this was
+    done by calling our hash function and compression and then by printing out 
+    the returned index. "int index = std::hash<std::string>{}(lowered) % 
+    hashTable.size(); std::cerr << index << std::endl;" Next was testing pushing
+    things onto the hash if the word was already on the hash and if the word was
+    not already int the hash. This was done through helper testing functions 
+    such as:
+        void Hash::printTest() {
+            for (unsigned long i = 0; i < hashTable.size(); i++) {
+                printChain(i);
+            }
+        }
+
+    void Hash::printChain(int n) {
+        for (unsigned long i = 0; i < hashTable[n].size(); i++) {
+            std::cout << "Lowered word: "
+                        << hashTable[n][i].loweredWord << std::endl;
+        }
+    }
+
+Next was to check addExistingord and addNewWord. For addNewWord, the test was to
+print the contents of the word to be added and then to run the test to print the
+chain and see if the word at the corretc index appeared entered or not. To test 
+addExisting word, the contents of the word was printed out and then the word was
+either pushed onto the back of the versions vector or, if the word was already 
+on the versions vector, the word was pushed into the instances vector and 
+printed. Here are the tests:
+    void Hash::printVersions(int n, int k) {
+        for (unsigned long i = 0; i < hashTable[n][k].versions.size(); i++) {
+            printInstances(n, k, i, hashTable[n][k].versions[i].word);
+        }
+    }
+
+    void Hash::printInstances(int n, int k, int z, std::string word) {
+        for (unsigned long i = 0; 
+            i < hashTable[n][k].versions[z].instances.size(); i++) {
+            std::cout << word << ": " 
+                << "Path: " << hashTable[n][k].versions[z].instances[i].path
+                << "Line: " << hashTable[n][k].versions[z].instances[i].lineNum 
+                << std::endl;
+        }
+    }
+
+Next was to test the rehashing function. This was done by printing out the 
+fillnumber, size and loadfactor for each case of rehashing. For the copying of 
+the table, first a test to see if the helper funciton was reached was 
+implemented "std::cerr << "Reached rehash helper << std::endl". Next, since the 
+hashTable must be cleared and then the size double, the size of the table after 
+clear and after doubling was printed. The, when rehashing the new index for each
+string was printed. We ran into a problem where the calculation for the 
+loadfactor was incorrect because we did not convert the size and fillnumber ints
+to floats. This was corrected and tested by printing out the converted floats. 
+Here are the tests:
+    void Hash::rehashIfNeed() {
+        fillnumber++;
+        std::cerr << fillnumber << std::endl;
+        float f;
+        f = fillnumber;
+        std::cerr << f << std::endl;
+        float size;
+        size = hashTable.size();
+        std::cerr << size << std::endl;
+        float loadfactor = f / size;
+        std::cerr << loadfactor << std::endl;
+        if (loadfactor > .75) {
+            std::cerr << "Rehashing!!" << std::endl;
+            rehash(size);
+        }
+    }
+    void Hash::rehash(int size) {
+        std::cerr << "In rehashing!!" << std::endl;
+        std::vector<std::vector<chainInfo>> oldTable = hashTable;
+        hashTable.clear();
+        std::cerr << hashTable.size() << std::endl;
+        hashTable.resize(size * 2 + 1);
+        std::cerr << hashTable.size() << std::endl;
+        for (int i = 0; i < size; i++) {
+            for (unsigned long j = 0; j < oldTable[i].size(); j++) {
+                int newIndex = hashCompression(oldTable[i][j].loweredWord);
+                hashTable[newIndex].push_back(oldTable[i][j]);
+                std::cerr << newIndex << std::endl;
+            }
+        }   
+    }
+
+Next was to test case sensitive and case Insensitive for both of the functions 
+in Gerp and in gerpHash. Since the fucntion in gerpHash finds either the 
+versions of instances vector with the word information and the funciton in Gerp 
+prints everything in the vecotr, the function in Gerp was the test for the 
+funciton in gerpHash and for itself. Here is the code:
+    void Gerp::caseInSen(std::string word, std::ostream &output) {
+        std::vector<Hash::versionsInfo> versions = hash.caseInSensitive(word);
+        for (unsigned long i = 0; i < versions.size(); i++) {
+            for (unsigned long j = 0; j < versions[i].instances.size(); j++) {
+                std::cerr << versions[i].instances[j].fileIndex << 
+                      versions[i].instances[j].lineNum << std::endl;
+            }
+        }
+    }  
+    void Gerp::caseSen(std::string word, std::ostream &output) {
+        std::vector<Hash::wordInfo> instances = hash.caseSensitive(word);
+        for (unsigned long i = 0; i < instances.size(); i++) {
+            std::cerr << versions[i].instances[j].fileIndex << 
+                      versions[i].instances[j].lineNum << std::endl;
+        }
+    }
+
+The next test was to test the query cmmand loop. This was done by creating a 
+command loop and then, for each query, printing an arbitrary std::cerr 
+statement. A problem was encountered where the command, "while (not "@q")" 
+wouldn't quit the program if the quit command as enetered. The while loop was 
+then changed to "while(std::cin >> query)". Here is the testing code:
+    void Gerp::commands(std::string outputFile) {
+        std::string query;
+        std::cout << "Query? ";
+        while (std::cin >> query) {
+            if (query == "@i" or query == "@insensitive") {
+                std::cerr << "Reached insensitive" << std::endl;
+            } else if (query == "@f") {
+                std::cerr << "Reached new file" << std::endl;
+            } else if (query == "@q" or query == "@quit") {
+                std::cerr << "Reached quit" << std::endl;
+            } else {
+                std::cerr << "Reached case sensitive" << std::endl;
+            }
+            std::cout << "Query? ";
+        }
+    
+        std::cout << "Goodbye! Thank you and have a nice day." << std::endl;
+    }
+
+Next was tetsing the change output file command. This was done by entering the 
+query and inputting a new file name, then running the program where something 
+would be printed to the file, and then entering the "ls" command in the terminal
+to check if the file appeared. Originally this was done is a helper funciton 
+where the stream was passed but this kept throwing error and it was decided 
+that, since the query was only 3 lines long, it would be done in the command 
+loop.
+
+FInally another issue was performance. We ran into two performance errors, one 
+during the indexing phase and one during the query phase of the program. The 
+first was that the program would make to slowly. The code ran in exponential 
+time and the bottleneck was found by tracing the logic of our funcitons as well 
+as printing std::cerr statements that threw every 10,000 times a word was added.
+This was so that the error messages were able to read since the program rocesses
+a huge amount of words. The issue was than, in addExisitingWord, the function 
+assigns a chainInfo struct to an index in the hashTable. Our original funciton 
+then returned the chainInfo struct as well and then reassigned it. SInce this 
+was extra work in that it was assigned, passed and then reassigned, this slowed 
+the progra down, especially towards the end when the instances vectors were huge
+since so many words had alreayd been procssed. This was fixed by converiting the
+unciton into a void function that only assigned and didn't return anything. The 
+second performance issu we had was with finding the user-inputted word and then 
+printig all instances of that word to an output file. Originally we stores the 
+line number and pathway of the word. Then we got the name of the file, opened it
+and went line by line in the file until it reached the corretc line. Then we 
+printed out the line information. This was costly since the function had to go 
+through every line of the file to reach the line number. This was fixed by 
+restructuring the program so that, instead of opening files and printing the 
+lines, the line contents and the file numbers were stored ina vector of vectors 
+of strings which had the line contents in it. Then the file number and the line 
+number were stored int he wordInfo struct. When printing, the fucntion used the 
+indexes of the file number and lne number to access the line contents in the 
+vector of vector of strings. This cost more space but was way more time 
+efficient. 
+
+Other issues we ran into. The first was when using the word search, both case 
+sensitive and case insensitive, to input words with characters appended on the 
+ends. When the program was ran it returned only the words in the directory that 
+had no non alpha numerica charcaters attached. This meant that any instance of 
+the word with any non alpha numeric character would be unattached. Therefore not
+enough was returned. This was fixed by calling the stripNonAlphaNum on every 
+word when inputted. An edge case considered was inputted stirngs that were all 
+non alpha numeric characters, such as "***". The solution for this was to run 
+through every string and, if the characters were all non alpha numeric, convert 
+the string into an empty string. Then when calling input into the hash table, 
+if the string is empty the table will skip over it and not input it. The second 
+issue we ran into was when the user searches for a word and the word is not 
+found, either becasue the word doesn't exist in the directory or becasue the 
+word is all non alpha numeric characters. This required putting in the std::cout
+statements "Not Found." for case insensitive and "Not Found. Try @insensitive or
+@i" for case sensitive. The solution for this was to, when returning the vector 
+with versions or intances depending on which case, check if the instances vector
+is empty. If it is empty than that means that no instances of that word exist in
+the directory and the std::cout statement is printed. 

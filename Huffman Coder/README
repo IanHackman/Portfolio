@@ -1,0 +1,424 @@
+/*******************************************************************************
+* Project 3: zap
+* cs15
+* README
+* Ian Hackman (ihackm01)
+*******************************************************************************
+
+
+Program Purpose:
+---------------
+    Purpose of zap is twofold. The first is to encode a given text file into 
+    binary didgits, 1s and 0s, by constructing a Huffman tree based on the 
+    frequencies of each charcter in the file, serializing the tree to be 
+    reconstructed when decoded, and encoding the text based on each character's 
+    leaf locaiton on the tree. The second is to decode an already encoded text 
+    through recreating the tree from the serialized tree and decoding it by 
+    traversing the paths based on the sequence of binary didgits in the encoded 
+    text. 
+
+
+Compile/run:
+-----------
+    - Compile using
+            make zap
+    - run executable with ./zap zap/unzap input_file.txt output_file.txt
+
+
+Acknowledgments:
+---------------
+    - Help from TAs on serialize and deserialize from phaseOne. No help 
+    was needed for phase 2.
+
+
+Files:
+-----
+
+HuffmanCoder.h: interface and funciton declarations for HuffmanCoder class, 
+includes classes HuffmanTreeNode and BinaryIO
+
+HuffmanCoder.cpp: funciton definitions for HuffmanCoder class, includes classes 
+HuffmanTreeNode and BinaryIO
+
+main.cpp: driver file to start zap and call the run the program using commands 
+specified by the user.
+
+README: this file
+
+Makefile: File to build the program.
+
+
+Data Structures:
+---------------
+    Huffman trees are a data structure used ot compress data into a small 
+    number of encoded bits to decrease the size of the data and increase the 
+    speed of transfer. Huffmantrees encode the data using sequences of 1s and
+    0s. This is determined by getting the character frequencies of eahc letter 
+    in the text and consturcting a binary tree where the leaves are the 
+    characters and the nodes are the sums of the characters. Nodes are 
+    connected starting with the least frequent, so that letters with the 
+    highest frequencies have the smallest encoding size. Encoding is determined 
+    by the sequence of traversal to reach each leaf, a 0 added for left subtree 
+    and a 1 for right subtree. The tree is then serialized into a string which 
+    serves as a blueprint to reconstruct later. The info is sent and then 
+    decoded through deserializing the tree using the sequence of nodes and 
+    leaves in the serialized string and then traversing the tree according to 
+    the encoded 0s and 1s sequence until leaves are reached. The original text 
+    is then recreated. The Huffmantree data structure was used to compress the
+    data using a fewer amount of bits that the normal ascii encoding. 
+    
+    Another data structure used is a priority queue, to order to nodes 
+    containing the frequencies of the characters from the text file. A priority 
+    queue works like a queue, first in first out, but the elements in the queue 
+    are given a priority that determines where they should be placed on the 
+    queue, the highest being placed in the front. Priority is determined with 
+    help from a comparator function. In the case of the Huffman tree, the 
+    lowest frequency characters wer egiven highest priority. Therefore the 
+    comparator funciton used <= to determine placement. The highest priority 
+    will always be at the front of the queue. A priority queue was used becuase,
+    due to the nature of the construction of a Huffman tree where the two lowest 
+    frequency nodes are combined, the queue of node frequencies had to be 
+    ordered from lowerst frequency as the priority and highest as the least 
+    priority. 
+
+Testing:
+-------
+    The testing for both phase 1 and phase 2 of zap was done using funcitons 
+    written in main.cpp. For phase 1, the count freq funciton was tested through
+    passing in a file name in the command line, creating an ifstream, opening 
+    the file and pasisng the text to the funciton which counted the frequencies 
+    and printed out the results. Since the order of frequencies differed from 
+    the reference, the frequencies of each character had to be counted by hand. 
+    At first, the function was written by comparing 2 arrays, one with the 
+    characters from the text and then one with every ascii value. This was 
+    scrapped for using a struct with the frequencies and character value 
+    instead. 
+            int main(int argc, char *argv[]) {
+                std::ifstream infile;
+                infile.open(argv[1]);
+                count_freqs_test(infile);
+            }
+            void count_freqs_test(std::istream &instream) {
+                count_freqs(instream);
+            }
+    Serialize tree was tested by creating an arbitrary Huffman tree, unordered, 
+    connecitng the nodes and then calling serialize and cheching if the 
+    serialized string is the same as what it should be. At first, the funciton 
+    was done without a helper function and eahc return added parts of the 
+    string. This was scrapped as the function would duplicate the string 
+    sequence for eahc path. A helper funciton that took the reference to the 
+    string was used instead. This was also tested for a null tree and a tree 
+    with only one node.
+            int main(int argc, char *argv[]) {
+                std::ifstream infile;
+                infile.open(argv[1]);
+                count_freqs_test(infile);
+            }
+            void serialize_test() {
+                HuffmanTreeNode *n1 = new HuffmanTreeNode('a', 42);
+                HuffmanTreeNode *n2 = new HuffmanTreeNode('b', 2);
+                HuffmanTreeNode *n3 = new HuffmanTreeNode('c', 100);
+                HuffmanTreeNode *n4 = new HuffmanTreeNode('d', 75);
+    
+                HuffmanTreeNode *n6 = new HuffmanTreeNode('I', 5, n1, n2);
+                HuffmanTreeNode *n7 = new HuffmanTreeNode('I', 5, n3, n4);
+                HuffmanTreeNode *n5 = new HuffmanTreeNode('I', 5, n6, n7);
+    
+                std::cout << serialize_tree(n5) << std::endl;
+                std::result = serialize_tree(node5);
+
+                if (result = "IILaLbILcLd") {
+                    std::cout << "Success!;
+                } else {
+                    std::cout << "Fail!;
+                }
+
+                delete node1;
+                delete node2;
+                delete node3;
+                delete node4;
+            }
+    Deserialize tree was tested through creating a stirng with a serialized 
+    version of the tree, passing it through deserialize. then another test 
+    fucntion was called which traversed the new tree using pre-order and 
+    printed the nodes. Then the tree was serialized and the returned string was 
+    compared with the original. This was done for a larger tree, a smaller tree 
+    and an empty tree. This fucniton required 2 visits to office hours. At first 
+    I tried to remove from the front of the string and the base case was that 
+    the stirng was empty. A TA suggested using a refernece to the index of the 
+    string and the total size instead. The second visit, the TA helped me 
+    determine when to increment the index when passing the string. They 
+    suggested using a reference to the index and incrementing in three spots 
+    instead of two. 
+            int main(int argc, char *argv[]) {
+                std::ifstream infile;
+                infile.open(argv[1]);
+                count_freqs_test(infile);
+            }
+            void deserialize_test() {
+                std::cout << "Figure 1" << std::endl;
+                std::string tree = "IIILaLbILeLfILcLd";
+                std::cout << "Original: " << tree << std::endl;
+                HuffmanTreeNode *newTree = deserialize_tree(tree);
+                deserialize_test2(newTree);
+                std::cout << std::endl;
+                std::string returnTree = serialize_tree(newTree);
+                std::cout << "Final: " << returnTree << std::endl;
+                if (tree == returnTree) {
+                    std::cout << "Full correct!" << std::endl;
+                } else {
+                    std::cout << "False" << std::endl;
+                }
+                    std::cout << "tiny tree:" << std::endl;
+                std::string tree2 = "ILaLb";
+                std::cout << "Original: " << tree2 << std::endl;
+                HuffmanTreeNode *newTree2 = deserialize_tree(tree2);
+                deserialize_test2(newTree2);
+                std::cout << std::endl;
+                std::string returnTree2 = serialize_tree(newTree2);
+                std::cout << "Final: " << returnTree2 << std::endl;
+                if (tree2 == returnTree2) {
+                    std::cout << "Full correct!" << std::endl;
+                } else {
+                    std::cout << "False" << std::endl;
+                }
+            }
+
+            void deserialize_test2(HuffmanTreeNode *curr) {
+                if (curr == nullptr) {
+                    return;
+                } else {
+                    std::cout << curr->get_val();
+                    deserialize_test2(curr->get_left());
+                    deserialize_test2(curr->get_right());
+                }
+            }
+    Phase 2 was created and tested by constructing encoder in order, testing 
+    each step using tetsing funciton and std::cout statements. Firts was testing 
+    opening the input file. This wa sodne by creating an open_or_die function, 
+    opening it and then printing the first line.
+            std:string input;
+            infile >> input;
+            std::cout << input;
+    Nest was tetsing count freqs. Since in funciton 1 the funciton printed the 
+    results to std::cout and didn't return anything, the funciton was changed 
+    by pushing the characters and their frequenceis to an array list private 
+    member variable. To test, th eentire array was printed and diff checked with 
+    the funciton in phaseOne.cpp.
+            for (int i = 0; i < freqsSize; i++) {
+                std::cout << encodeArr[i].freq << encodeArr[i].chars;
+            }
+    Next was testing pushQueue. This was doe similar to countFreqs by printing 
+    the contents of the priority queue.
+            while (not pq.empty()) {
+                HuffmanTreeNode node = pq.top();
+                std::cout << pq->get_val() << pq->get_freq();
+                pq.pop();
+            }
+    Next was tetsing buildtree. While consturcting the function, std::cout 
+    statements were placed after each if and else statement to ensure the base
+    and recursive cases were functioning properly. The current and next node was 
+    printed as well, through "HuffmanTreeNode *node1 = top(); std::cout << 
+    node1->get_val()". The internal nodes were also printed and tested. In 
+    addition, af6ter each call, the contents of the priority queue were printed 
+    as well. After the tree was built, it was tested similat to deserialize_tree
+    by calling serialize and also traversing it pre-order. 
+            void encoder(std::string input_file, std::string output_file) {
+                HuffmanTreeNode *tree = buildTree();
+                testBuildTree(tree);
+            }
+            void HuffmanCoder::testBuildTree(HuffmanTreeNode *curr) {
+                if (curr == nullptr) {
+                    return;
+                } else {
+                    std::cout << curr->get_val() << curr->get_freq();
+                    testBuildTree(curr->get_left());
+                    testBuildTree(curr->get_right());
+                }
+            }
+    Next was encoding the text. Immediatly a problem arrose when trying to 
+    encode the text where no input would occur and the funciton would never 
+    compute anything. The problem was that, after reading in the file for count 
+    freqs, the file had to be reopened and read from again, character by 
+    cracter. Opening the file the second time was tested by 
+    "infile.open(file_name); infile.get(char); std::cout char;". Next the 
+    funciton itself was tested by putting print statements everywhere. This was 
+    useful as it allowed me to trace the function calls and make sure the string 
+    was being added to and removed from correctly. This was then tested by 
+    running the program with a file, running the program until after encode, 
+    printing the result, then making the correct binary tree from the file by 
+    hand, encoding and then comparing the 2 results. The binary sequence was 
+    also compared with the reference output. 
+            void HuffmanCoder::encodeHelper(char target, HuffmanTreeNode *curr){
+                std::cout << in helper;
+                std::cout << encodedWordHelper;
+                if (curr->isLeaf()) {
+                    if (curr->get_val() == target) {
+                        std::cout << in target;
+                         encodedWord.append(encodedWordHelper);
+                         std::cout << encodedWord;
+                    }
+                    std::cout << in return;
+                    return;
+             } else {
+                std::cout << else;
+                encodedWordHelper.push_back('0');
+                std::cout << encodedWordHelper;
+                encodeHelper(target, curr->get_left());
+                encodedWordHelper.pop_back();
+                encodedWordHelper.push_back('1');
+                std::cout << encodedWordHelper;
+                encodeHelper(target, curr->get_right());
+                encodedWordHelper.pop_back();
+                std::cout << encodedWordHelper;
+            }
+        }
+    Next was serialize tree. Since this function remained the same as in 
+    phaseOne, the same tests as before were used.
+    Next tetsting the print statement for bit size and then the output to the 
+    BinaryIO write file funciton. For bit size, the test was running different 
+    files through the program and through the reference and comparing the 
+    printed bit size to make sure they were the same. The bit size was 
+    determined by taking the size of the encoded text, the number of 1s and 0s. 
+    Write file was tested by calling the funciton with the correct parameters 
+    and then doing "cat output.txt". This was difficult to test as there were 
+    differences in the serialize and encode sequence between my program and the 
+    ref. Therefore, the test was to see the two encoding sequences and see if 
+    the patterns in the two sequences were similar. Since they both encode the 
+    same letters in the same sequence, just with different patterns of 1s and 
+    0s, the pattern should be the same.
+
+    Next was testing the decoder sequence. This was tested assuming that the 
+    encoder sequence was correct, since the decoder can only read the output 
+    from the encoder. 
+
+    The first step of testing was to call the readFile funciton from BinaryIO 
+    to read the serialized tree and encoded sequence and return it in the form 
+    of an arrayList, which was stored in a private member variable. This was 
+    tetsed by printing the array.
+        std::cout << decodeArr[0] << " : " << decodeArr[1];
+   
+    Next, deserialize tree was tested. Since it is the same as from phaseOne, 
+    the test for it was also the same. 
+        void decoder(std::string input_file, std::string output_file) {
+            testDeserialize(tree);
+            std::string result = serialize_tree(tree);
+            std::cout << result;
+        }
+        void HuffmanCoder::testDeserialize(HuffmanTreeNode *curr) {
+            if (curr == nullptr) {
+                return;
+            } else {
+                std::cout << curr->get_val() << std::endl;
+                testDeserialize(curr->get_left());
+                testDeserialize(curr->get_right());
+            }
+        }
+
+    Next decode stirng was tested also by placing print statements for everyif 
+    and else option in order to trace the function calls and the current states 
+    of the parameters at each of the calls. Difficulties arose in dtermining 
+    how to continue calling the decode recursive helper, the function that 
+    actually finds the character in the binary tree, At first, an ifstream with 
+    the encoded string as input was considered. This was scrapped as the 
+    funciton kept terminating early. It was then decided to keep track of the 
+    number of 1s and 0s the recursive helper moves through and return that 
+    number. Then the same number of characters would be removed from the front 
+    of the string. Next was determining where the runtime_error statement would 
+    be placed. It was put as a base case, if the index is the same as the size 
+    and the node the function is at is not a leaf than the encoding is wrong 
+    and the error will be thrown.
+        std::string HuffmanCoder::decodeString(HuffmanTreeNode *root, 
+                                               std::string encoded) {
+            while (not encoded.empty()) {
+                int index = 0;
+                int size = encoded.size();
+                std::cout size;
+                std::cout << "Current Char" << encoded[0];
+                decodeStringHelper(root, encoded, index, size);
+                std::cout << index;
+                encoded.erase(0, index);
+                std::cout << encoded;
+            }
+            std::string decoded = decodeHelper;
+            std::cout << decoded;
+            return decoded;
+        }
+        void HuffmanCoder::decodeStringHelper(HuffmanTreeNode *curr, 
+                                    std::string encoded, int &index, int size) {
+            if (index == size && not curr->isLeaf()) {
+               std::cout << "in error;"
+               throw std::runtime_error("Encoding did not match Huffman tree.");
+            } else if (curr->isLeaf()) {
+                std::cout << "in leaf"
+                decodeHelper.push_back(curr->get_val());
+                std::cout << decodeHelper;
+                return;
+            } else {
+                std::cout << "in else";
+                if (encoded[index] == '0') {
+                    std::cout << "in 0";
+                    index++;
+                    std::cout << index;
+                    decodeStringHelper(curr->get_left(), encoded, index, size);
+                } else if (encoded[index] == '1') {
+                    std::cout << "in 0";
+                    index++;
+                    std::cout << index;
+                    decodeStringHelper(curr->get_right(), encoded, index, size);
+                }
+            }
+        }
+    Finally, printing to output was tested by running my program and then the 
+    reference program with the same text file and then diffing the results to 
+    make sure there were no differences. This was done with all of the provided 
+    text files. 
+
+    The last thing to test was deleting the constructed trees, both for the 
+    encoder and the decoder. This was done with a post-order recursive deletion 
+    function and tested by running the whole program with a text file with 
+    valgrind and ensuring that there were no memory leaks and no memory errors.
+
+    Before submitting, the cerr statements were tested by passing the output 
+    flow from my program and the reference program to different files and then 
+    diffing the result to ensure no differences. 
+
+    ANother source of error that needed testing was the deserializeTreeHelper 
+    funciton. Issues were run into regarding valgrind where memory errors
+    occured. The issue was reading in leaf characters that were 'L' or 'I'. 
+    Originally the fix was to check if the character before L or I is L or I 
+    to determine. This worked but then, after rewriting decode, more memory 
+    issues appeared. The fix was to rewrite deserialize using a string stream. 
+    Here are the tests:
+        void HuffmanCoder::decoder(std::string input_file, 
+                                    std::string output_file) {
+            ...
+            HuffmanTreeNode *tree = deserialize_tree(decodeArr[0]);
+            std::string result = serialize_tree(tree);
+            std::cerr << "Final string: " << result << std::endl;
+            createdTree = tree;
+            std::string orig = decodeArr[0];
+            std::cerr << "Orig  string: " << orig << std::endl;
+            if (orig == result) {
+                std::cerr << "Correct!" << std::endl;
+            } else {
+                std::cerr << "False!" << std::endl;
+            }
+            ...
+        }
+    
+    TESTING FILES: to test all of the fucntions in the program, the provided 
+    testing files were used. At first each function was tested using a small 
+    file, such as banana.txt or banana_apple.txt, and then tested using a 
+    large file, such as works_of_shakespeare. The large file was especially 
+    useful as it had nearly every ascii character and tested the edge cases, 
+    such as leaf nodes with characters I and L. No new files were created. 
+    banana.txt was ocasionally modified to in order to test edge cases. Here 
+    are examples of how it was modified:
+        Contents:        -test empty
+        Contents: asd III LLL        -tets I and L leaf nodes
+        Contents: a         -test single character
+    
+    Error messages were tested by passing the cerr output stream to a file from 
+    my program, doing the same with the reference program and then diff testing 
+    the results in bash to ensure no differences.
