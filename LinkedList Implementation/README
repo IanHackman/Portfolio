@@ -1,0 +1,109 @@
+/*******************************************************************************
+* HOMEWORK 1: unit_test and CharLinkedList
+* Comp 15 Spring 2021 
+* README
+* Author: Ian Hackman (ihackm01)
+*******************************************************************************/
+
+B. Purpose:
+---------------
+
+    The purpose of this program is to create and implement a linked list data structure of characters. The linked list is either empty, has 1 character or has many characters, according to which constructor is used. In addition, public funcitons are included that either find and return a certain aspect of the array list or add, remove or restructure the nodes containing the characters in the list. The private member variables contain the nodes and pointers to traverse the list.
+
+C. Acknowledgments:
+---------------
+
+    I worked on this assignment by myself and didn't ask for help from a TA or student.
+
+D. Files:
+-----
+
+    CharLinkedList.h: the interface file for with the CharLinkedList Class, its public and private funcitons and variables.
+
+    CharLinkedList.cpp: The implementation of a CharLinkedList Class.
+        There are 3 constructors for this class. The first initializes an empty CharLinkedList of size and capacity 0, the second initializes a CharLinkedList of size and capacity 1 and the thrid initializes a CharLinkedList of size and of an imported array. There is a destructor, copy constructor and assignment operator in addition to other functions that manipulate the list or traverse it to return characters.
+
+    unit_tests.h: A unit testing file for the CharLinkedList Class. 
+        Runs in conjunction with the unit_test framework to allow for testing of individual functions using assert() and other functions in CharArrayList such as first(), size(), elementAt() and toString().
+
+    Makefile: File to build the program.
+
+E. Compile/run:
+-----------
+
+    clang++ -Wall -Wextra -c CharLinkedList.cpp
+
+    Run using the command "unit_test" which compiles code and then runs the program
+
+F. Data Structures:
+---------------
+
+    The data structure used is a linked list which is a sequence of heap-allocated nodes that are connected through pointers. This list is a doubly pointer list which means that each node points to the one next and previous to it. The nodes themselves contain an element with a character, a pointer next and a pointer previous. In addition, pointers named front and back are seperate pointers that point to the front and back of the linked list. The advantages of using a linked list is that inserting or removing elements are easy because, unlike an array list, one does not have to shift all the elements, just rearange a few pointers. Another advantage is that the memory used for the nodes is proportional to the memory for the entire list. One does not need to allocate extra space like a linkedArray. The disadvantages of a linked list is that random access is not allowed as there is no index. To find a node one had to traverse the entire list. In addition, linked list requires extra storage for pointers unlike the arraylist. 
+
+G. Testing:
+-------
+    To test constructors, linked lists were made using the three constructors and their sizes and specific elements at specific indexes were tested to see if they matched what they should be. Functions where elements are either inserted or deleted were tested through creating arrays and inserting or deleting elements in either the front, back, middle or at an index that is out of bounds. The copy constructor was tested by creating two arrays and copying one onto the other and then checking if the size of the copied onto is the same of the copied. The assignment operator was tested by creating two arrays, setting one equal to the other and testing if the contents of the copied into are the same as the copied. 
+
+H. Timer
+-------
+
+     1. Insertion
+        a. pushAtBack - 2005 ns
+        b. insertAt middle - 63247206 ns
+        b. pushAtFront - 3033 ns
+       Removal
+        a. popFromBack - 2186 ns
+        b. removeAt middle - 72748846 ns
+        b. popFromFront - 2436 ns
+       Removal
+        a. last() - 466 ns
+        b. elementAt() for middle - 113139079 ns
+        b. first() - 526 ns
+    
+    2. The slowest functions were those that had to access the middle of the list. This is because the program has to traverse the list, acessing and passing through every node. There is no index value, unlike array lists. The fastest operations were those that acessed the front or back of the list. This was because no traversal was necessay as one only had to acess the front and back pointers. 
+
+    3. Disparities were at pushAtFront, popFromFront and elementAt. For pushAtFront, arraylist took linger because one had to shift every element in the list whereas for linked list all one had to do was rearrange pointers. For popFromFront, arraylsts took longer for the same reason as pushAtFront. For elementAt, linked lists took considerably longer due to the fact that one has to traverse through the entire list, unlike array lists where, if one has the index they can access the element immediatly. 
+
+
+I. Questions
+-------
+    1. Functions that were easier to linked list were funcitons that included inserting nodes either at the beginning or middle of the list. This is easier because, unlike in array lists where one has to shift all the other elements in the array, the linked list only requires the reassigning of a few pointers. 
+
+    2. Functions that were more difficult for linked lists were functions that required traversing through the linked list to find an element at a certain index. This is harder because, unlike array lists which have random access, linked lists have no index variable. The only way access elements is to move through the list sequentially. 
+
+    3. The client would have to analyze their code and see which operations require list traversal and insertion. They would have to change their programs functions to avoid the functions that take a long time to improve the program's efficiency. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

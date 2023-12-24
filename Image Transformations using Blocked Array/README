@@ -1,0 +1,141 @@
+Will Randall and Ian Hackman (ihackm01)
+
+Help Received: A TA was consulted for questions concerning function pointers. 
+In addition, the lab Striding Through Memory provided a helpful demonstration
+for the functionality of caches. 
+
+Correctly Implemented: All portions of the assignment are correctly
+implemented.
+
+Architecture of Solutions: 
+UArray2b: UArray2b was implemented with a single UArray that went block by 
+block. For each row of blocks in the UArray. Within each block the underlying
+array goes in row-major order. The client can either allocate the array with a
+blocksize of their choosing or with UArray2b_new_64K_block which uses the
+default maximum blocksize based on the size of the UArray and dimensions given.
+To access each element in the array an indexing equation was used that factored
+in the row, column, blocksize, height and width. To map through the array,
+UArray2b_map followed the same order as how each element is stored in the
+single UArray. 
+
+A2Plain.c: Implemented similarly to A2blocked.c, except utilized row-major and
+col-major instead of block-major.
+
+ppmtrans.c:  The ppmtrans program utilizes a single apply function. This apply
+function is passed to either the default mapping function or the mapping
+function specified in the command line arguments. Our apply function takes in a
+function pointer, through the struct passed in through void *cl, which tells
+the apply function where to map each pixel based on the transformation
+requested on the command line. We create a new A2 array containing the
+transformed image, then write it out to a stdout using Pnm_ppmwrite().
+
+Measured Performance: 
+Image sizes: 
+mobo.pnm: 143M
+90-degree rotation:
+Row-major:
+Total CPU time: 6176953197.000000 ns
+Time per input pixel: 123.689470 ns
+Average instructions per input pixel: 123.689470 (1 instruction per ns)
+Ranking: 2
+Col-major:
+Total CPU time: 6886536924.000000 ns
+Time per input pixel: 137.898423 ns
+Average instructions per input pixel: 137.898423
+Ranking: 5
+Block-major:
+Total CPU time: 6466812146.000000 ns
+Time per input pixel: 129.493707 ns
+Average instructions per input pixel: 129.493707
+Ranking: 3
+Explanation:
+As expected in our predictions listed in our design doc, row-major and
+block-major perform similarly, whereas col-major performs more poorly.
+This very closely aligns with our predictions.
+
+For both row-major and block-major:
+-In reading from the original array for row-major and block-major, the order in
+which the elements of the original image array are accessed perfectly aligns
+with the order of the underlying contiguous array, and thus perfectly leverages
+spatial locality.
+-However, the order in which we access the array representing the rotated image
+does not leverage spatial locality well at all, as it accesses the elements in
+a way that jumps around the underlying contiguous array.
+
+For column-major:
+-The order in which the original image array is accessed does not align with
+the implementation of UArray as elements are accessed out of order due to the
+elements not being sequentially stored by columns.
+-The order in which we access the rotated image array, aligns decently with the
+underlying contiguous array. Within each row, it is accessing the elements in
+backwards order of the underlying array, but at the end of each row, it jumps
+to a new point in the underlying array, which would result in a cache miss.
+
+One fact which we did not account for in our prediction, which explains why
+block-major performed slightly worse than row-major, rather than exactly the 
+same, is the fact that if the blocksize does not nicely align with the 2d array
+size, then there will be uninitialized values in the underlying array that will
+be skipped over. These skips result in an occasional cache miss.
+
+
+
+
+
+180-degree rotation:
+Row-major:
+Total CPU time: 4459181439.000000 ns
+Time per input pixel: 89.292208 ns
+Average instructions per input pixel: 89.292208
+Ranking: 1
+Col-major:
+Total CPU time: 8303900265.000000 ns
+Time per input pixel: 166.280202 ns
+Average instructions per input pixel: 166.280202
+Ranking: 6
+Block-major:
+Total CPU time: 6568304856.000000 ns
+Time per input pixel: 131.526033 ns
+Average instructions per input pixel: 131.526033
+Ranking: 4
+Explanation of Results: 
+Both row and column major aligned with out initial expectations as the best and
+worst performance. Block major performed wors than expected due to the
+unaccounted uninitialized values within the array that are skipped over.
+Row major performed the best out of all the 6 tests, exactly as we expected in
+our performance estimations.
+This is because the order in which the elements of the original image array are
+accessed perfectly aligns with the order of the underlying contiguous array,
+and thus perfectly leverages spatial locality. 
+The order in which the elements of the rotated image array are accessed
+leverages spatial locality well within each row, but jumps locations in the
+underlying array when it moves between each row.
+
+Col major performed the worst out of all 6 tests which was expected. 
+This is because the order in which the elements of the original image array are
+accessed does not at all utilize the spatial locality properties of the
+underlying array, because in the underlying array it is jumping to a completely
+new location with every new access.
+The order in which the elements of the rotated image array are accessed does
+not at all utilize the spatial locality properties of the underlying array,
+because in the underlying array it is jumping to a completely new location with
+every new access.
+
+Block major performed 4th out of all 6 tests. 
+Our initial prediction expected it to perform as well as row major. However, we
+did not account for all of the uninitialized values that would have to be
+skipped over while accessing elements from the original array. Besides skipping
+uninitialized values, the initialize elements are still accessed contiguously
+in the original array, therefore locality is better than column major.
+The order in which the elements are accessed in the original image are the same
+as the UArray2b implementation thus utilizing spatial locality. 
+The order of which elements are accessed in the rotated image align with the
+UArray2b representation but in reverse, as the last elements are accessed
+first. Thus the array will be accessed in order yielding good spatial locality.
+
+Computer used to run tests:
+Name: Red Hat Enterprise Linux 8.8
+Processor: Intel Core i7-10700T @ 2.00GHz x 16
+CPU Type: 165
+Clock Rate: 2000 MHz
+
+Hours Spent:  22.5

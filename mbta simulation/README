@@ -1,0 +1,181 @@
+/**********************************************************
+* Project 1: Metro Simulator
+* CS 15
+* Ian Hackman (ihackm01)
+* README
+*
+*********************************************************/
+
+Compile/run:
+     - Compile using
+            make MetroSim and make
+     - run executable with
+            ./MetroSim stationsFile passFile [commands]
+
+
+Program Purpose:
+    Run the metroSim program where a file of stations is printed and the user can either assign new 
+    passengers to embark and disembark at specific stations or move the train to pick up and drop off 
+    the added passengers. The program contains two classes, MetroSim and PassengerQueue and one struct, 
+    Passenger. MetroSim contains the functions that read in the files and execute the commands. 
+    PassengerQueue creates the queue lists that the STations struct in MetroSim uses and also includes 
+    funcitons to add, remove, check the size of and print the queue. Passenegr contains the struct 
+    that holds the information for each new passenger assigned by the user. It also contains a function 
+    element to print itself out. All three are linked and initiated in main.cpp by constructing a 
+    MetroSim instance from the given files in the terminal. 
+
+Acknowledgements: 
+- I recieved no help coding Passenger, PassengerQueue or MetroSim. Design checkoff with a TA who 
+critiqued my implementation plan, corrected my misunderstanding of the spec regarding the queue of 
+passengers on the train and helped me design a plan that would run more efficiently. Code for file 
+I/O from class slides. I recieved hep from a TA for a bug fix, I think Niall Sheridan (forgot to ask 
+for his name), Thursday at 6:00.
+
+Files: 
+
+main.cpp:
+     constructs a MetroSim instance
+
+MetroSim.cpp:
+     Function definitions for MetroSim class
+
+MetroSim.h:
+     Interface of MetroSim class and function declarations.
+
+stations.txt:
+     an example file containing a list of stations.
+
+stations5.txt
+    file containing 5 stations to test program with
+
+stations2.txt
+    file containing 2 stations to test program with
+
+stations100.txt
+    file containing 100 stations to test program with
+
+test_commands.txt:
+     sample list of commands that you could give to the simulator
+
+commands5.txt
+     list of commands to test program with the stations5.txt file. Emphasis on edge cases.
+
+commands2.txt
+     list of commands to test the edge case of having the minium amount of stations. 
+
+the_metroSim:
+     reference implementation for students to see how 
+
+PassengerQueue.h:
+     Funciton declarations for PassengerQueue class
+
+PassengerQueue.cpp:
+     Function definitions for the PassengerQueue class.
+
+Passenger.h:
+    Passenger struct definition and struct element function declarations
+
+Passenger.cpp:
+     Function definition for Passenger struct element
+
+Note:  the program should handle all cases.
+
+Data Structures: 
+     - PassengerQueue: queue lists using linked lists to remove and insert nodes with Passenger 
+     structs at the front and back of the queue. Queues operate with a first in first out where 
+     the first element in the list is the first to be dequeued. Queues have limited acess in that 
+     one can only add to the back and remove from the front. Access to the middle of the list is 
+     not allowed. Queues can be implemented with either a linked list or an array list, each have 
+     the same pros and cons which carry over to the queue. 
+     - MetroSim: dynamically allocated array of a fixed size. The program reads the file with the 
+     stations and allocates an array of the size of the number of stations in the file to store the 
+     Station structs. This is similar to an ArrayList but it doesn't shrink or grow in size. 
+
+
+Testing:
+
+Passenger: the print function was tested through initializing a struct, giving each element a random 
+value, declaring an outstream string, passing it to the print element of the struct and checking if 
+what is printed is the same as what should be printed according to the spec.
+
+PassengerQueue: enqueue was tested by creating three Passsenger structs, assigning them values and 
+adding them to the queue list. The print element of the queue list was called on the list and the 
+output was checked to what is should be. Dequeue was tested by taking the queue from the enqueue test 
+and removing one Passenger and printing the resulting string. Test size was tested by creating a 
+queue of size 3 and asserting if the queue had three elements. Front was tested by creating a queue, 
+returing the first element and asserting if it is the same as it should be. 
+
+MetroSim: the functions of metroSim were tested through running the program in main.cpp, manually 
+inputting specific commands and then writing files with stations and commands to test the edge cases 
+of the program. For reading in the program, testing the error messages was done first. First, providing 
+too few arguments in the terminal. Then testing opening files by typing in the terminal a file that 
+doesn't exist. Next, reading in the file was tested. In the function that reads in thie file, the 
+function iterates through each line and increments an int to get the total number of stations. This 
+was done and then the result was printed in the terminal. Next, an empty array was initialized the 
+size of the number of staitons with each element of the Station struct in the array empty. The entire 
+empty array was printed to the terminal to make sure it was empty. Next the station names were read in 
+line by line and assigned to the stationName element for each struct in the array. The entire array was 
+then printed out to ensure the names were read in correctly. Next the print function for the stations 
+was written and through calling the function. Next the add passenger function was tested by creating a 
+new passenger and adding it to the station queue. This was done multiple times as well as adding many 
+new passengers to the same station. Incrementing the passengerId was tested by ensuring each new 
+passenger's id was 1 more than the previous. Next, the move train function was tested, first without 
+enqueueing or dequeueing any passengers, to ensure the program printed out the stations with 
+"TRAIN: " at the station after the previous. Testing included moving the train to the last station, 
+moving it again, and ensuring that when the program printed the stations again, "TRAIN: " was at 
+station 0. The first time this happened there was a segfualt which was resolved by setting trainIsAt 
+equal to numStations - 1. Next adding the passengers waiting at the station was tested by assigning 
+passenger to stations using cin and moving the train to that station to see if the passengers were 
+picked up. Additional tests included assigning many passengers to the same station and seeing if they 
+were all added to the passengers on train queue. To test if each passenger was added correctly to the 
+train queue, done by assigning the Passengers to the corresponding train station number based on their 
+"to" element, the entirety of the train queue was printed after a new passenger was added. This then 
+became the "Passengers on the train: {}" function. One problem encountered with the print function was 
+that the function would print the first passengers in an endless loop. This was due to a while loop 
+whose condition never ended. This was fixed by changing the while loop to a for loop through the 
+stations array. To test dequeueing passengers from the train, passegers were added and then the train 
+was moved to their "to" spot to pick them up. Bugs that were fixed icluded the train only dequeueing 
+Passengers one stop after they were supposed to get off. This was corrected by incrementing the 
+trainIsAt int after passengers were boarded and then dequeued. Another bug that was fixed was adding 
+passengers to the station the train was currently at and then having them leave the station after. 
+Edge cases such as adding passengers that had to be picked up after the train loops back to the 
+sattions were tested as well. After this, the command loop was tested by entering the commands many 
+times and entering commands that shouldn't work, such as 'm p' or to and from values greater than the 
+number of stations. Errors that were encountered was the loop calling "input >> command" too many 
+times where one would input the command but, when enter was pressed, the terminal would ask for 
+another. This was fixed by giving the while loop the condition "while(input >> command)". Next, 
+program was tested using the test_commands.txt file, rather than using cin, and than diffing the 
+result with the demo. Then the program was tested by removing the endline from the stations.txt file
+ and seeing if the number of station would match when the file had the endline. Then the program was 
+ tested using edited versions of the stations.txt file. These included: a file with 100, 5 and 2 
+ stations to ensure the program would work the same. Command.txt files were also written for the files 
+ with different stations, however a problem was encountered where the commands text file would not 
+ show in the terminal. Therefore, the commands were entered using cin and compared to the same manual 
+ entry in the demo. The outfiles for both were also compared and determined as the same. The results 
+ of the output was diffed with the results of running the demo with the same augmented station files. 
+ Finally, to improve performance eidits were made to the while loops. For the while loops that dequeue 
+ the entire queue for passengers getting on the train or passengers getitng off the train, my progrma 
+ initially had "while(stations[i].passegerQueue.size() != 0)". However, since this was a call to a 
+ funciton of O(n) complexity, I decided to replace the calls to the size functions with integers 
+ elements added to both queues in the STations queue by incrementing and decrememtnig each when 
+ passenegrs boarded or left the train. This was by running the test_commands.txt again and then 
+ diffing the result with the demo. The biggest obstacle I encountered while testing was matching the 
+ outputs of my program to the demo. I submitted the first time and recieved a poor outograder score 
+ with no explanation was to why "No mitigration is available!". I was told on piazza to check every 
+ output to ensure they're all the same. I diff checked every single possible output between my program 
+ and the demo, the output file, reading commands from a file and passing std::cout to another file, 
+ passing commands in a file to std::cin and then passing std::cout to a file and all the std::cerr 
+ messages. They was no difference. Finally I went to office hours and the TA figured out that, when 
+ the program wasn't reading from a file, the outstream never opened. Thus, when given an output file 
+ not in the directory, the program failed. 
+
+
+The most difficult part of writing and testing the program was reading in the file streams for the 
+input and output, creating the commands funciton to accept both cin and instream from a file, and 
+then figuing out how to pass the output streams to the correct functions. A difficulty was passing 
+the output stream that writes the the output file "Passenger _ left train at ___" to the 
+removePassengersFromTrain function. I had to declare a new outstream in the commands loop.
+
+Time:
+    Phase 1 - 1 or 2 hours
+    Phase 2 - 4 or 5 hours
