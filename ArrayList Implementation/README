@@ -1,0 +1,101 @@
+/*******************************************************************************
+* HOMEWORK 1: unit_test and CharArrayList
+* Comp 15 Spring 2021 
+* README
+* Author: Ian Hackman (ihackm01)
+*******************************************************************************/
+
+B. Purpose:
+---------------
+
+    The purpose of this program is to create and implement an array list data structure of characters. The array list is either empty, has 1 character or has many characters. In addition, public funcitons are included that either find and return a certain aspect of the array list or add, remove or restructure the characters in the list.
+
+C. Acknowledgments:
+---------------
+
+    I worked on this assignment by myself and didn't ask for help from a TA or student.
+
+D. Files:
+-----
+
+    CharArrayList.h: the interface file for with the CharArrayList Class, its public and private funcitons and variables.
+
+    CharArrayList.cpp: The implementation of a CharArrayList Class.
+        There are 3 constructors for this class. The first initializes an empty CharArrayList of size and capacity 0, the second initializes a CharArrayList of size and capacity 1 and the thrid initializes a CharArrayList of size and of an imported array. There is a destructor, copy constructor and assignment operator in addition to 21 other funcitons. 
+
+    unit_tests.h: A unit testing file for the CharArrayList Class. 
+        Runs in conjunction with the unit_test framework to allow for testing of 
+        individual functions. There are 27 tests, at least one for each funciton.
+
+    Makefile: File to build the program.
+
+E. Compile/run:
+-----------
+
+    clang++ -Wall -Wextra -c CharArrayList.cpp
+
+    Run using the command "unit_test"
+
+F. Data Structures:
+---------------
+
+    The data structure used in this program is an array list which is an array that dynamically expands to fit elements added to the array. It was created using std::vector, using its public functions size(), front(), back(), clear(), resize(size) and push_back(). The advantages of using an array list are that the list can be resized so that adding elements is easy. In addition array lists allow for quick acess if one has the index of the element they wish to find. The disadvantages of an array list are that allocating a new array and copying old elements to the new array takes a long time. In addition, adding or deleting items can take awhile as one needs to shift every item in the list foward or backwards. 
+
+
+G. Testing:
+-------
+
+    Constructors:
+        To test constructors, array lists were made using the three constructors and their sizes and specific elements at specific indexes were tested to see if they matched what they should be. Functions where elements are either inserted or deleted were tested through creating arrays and inserting or deleting elements in either the front, back, middle or at an index that is out of bounds. The copy constructor was tested by creating two arrays and copying one onto the other and then checking if the size of the copied onto is the same of the copied. The assignment operator was tested by creating two arrays, setting one equal to the other and testing if the contents of the copied into are the same as the copied. 
+
+H. Timer
+-------
+
+    1. Insertion
+        a. pushAtBack - 537 ns
+        b. insertAt - 16966371 ns
+        b. pushAtFront - 33961674 ns
+       Removal
+        a. popFromBack - 628 ns
+        b. removeAt - 16781185 ns
+        b. popFromFront - 33576833 ns
+       Removal
+        a. last() - 538 ns
+        b. elementAt() - 568 ns
+        b. first() - 603 ns
+    2. The removal function all took less time because they don't interact with the contents in the array they just find an element at an index and return it. pushAtBack and popFromBack took less time because an element was only added to the back. The ydon't require the elements in the array to be shifted over. insertAt, pushAtFront, removeAt and popFromFront take longer because the elements need to be shifted one spot over which takes time. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
